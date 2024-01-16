@@ -23,12 +23,15 @@ def download_video(request):
                 print("File path after pytube download:", file_path)  # Debug statement
 
             except Exception as e:  # Fallback to yt-dlp if authentication fails
-                ydl_opts = {'outtmpl': '%(id)s.%(ext)s', 'verbose': True}  # Output template with verbose option
+                from yt_dlp import YoutubeDL
+                ydl_opts = {'outtmpl': '%(id)s.%(ext)s'}  # Output template
                 with YoutubeDL(ydl_opts) as ydl:
-                    info_dict = ydl.extract_info(video_url, download=True)
-                    file_path = info_dict.get('filepath', None)
-                    print("Info dict after yt-dlp download:", info_dict)  # Debug statement
-                    print("File path after yt-dlp download:", file_path)  # Debug statement
+                    try:
+                        info_dict = ydl.extract_info(video_url, download=True)
+                        file_path = info_dict.get('filepath', None)
+                    except Exception as e:
+                        print(f"Error downloading video with yt-dlp: {e}")
+                        file_path = None
 
             # Proceed with file serving if file path is valid
 # Proceed with file serving if file path is valid
